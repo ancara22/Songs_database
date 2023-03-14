@@ -7,37 +7,14 @@
 
 void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, Song> &table);
 void addSongToHashTable(std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table);
+void printMenu(SeparateChaningHash<std::string, Song> &table);
+void readFile(SeparateChaningHash<std::string, Song> &table);
 
-int main()
-{
+int main() {
 
-  SeparateChaningHash<std::string, Song> songTable;
+  SeparateChaningHash<std::string, Song> songsTable;
 
-  bool isPathIncorrect = true;
-  std::string file_path;
-
-  // Read data from file
-  while (isPathIncorrect)
-  {
-    std::cout << "Enter absolute/relative file path(or enter Y to read the default file): ";
-    std::cin >> file_path;
-    if (file_path == "Y")
-    {
-      file_path = "./sample_song_data.dat";
-    }
-
-    readSongsFromFile(file_path, songTable);
-
-    if (songTable.empty())
-    {
-      std::cout << "\n----------------------- Incorrect file path! Try again! -------------------------\n\n";
-    }
-    else
-    {
-      std::cout << "\n-----------------------------------  Succes! ------------------------------------" << std::endl;
-      isPathIncorrect = false;
-    }
-  }
+  printMenu(songsTable);
 
   // Test
   // Song obj = songTable["Balmorhea"];
@@ -46,8 +23,33 @@ int main()
   return 0;
 }
 
-void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, Song> &table)
-{
+void readFile(SeparateChaningHash<std::string, Song> &table) {
+  bool isPathIncorrect = true;
+  std::string file_path;
+
+  // Read data from file
+  while (isPathIncorrect) {
+    std::cout << "Enter absolute/relative file path(or enter Y to read the default file): ";
+    std::cin >> file_path;
+
+    if (file_path == "Y") {
+      file_path = "./sample_song_data.dat";
+    }
+
+    size_t qtyBefore = table.getTotalSize();
+    readSongsFromFile(file_path, table);
+    size_t qtyAfter = table.getTotalSize();;
+
+    if (table.empty() || qtyBefore == qtyAfter) {
+      std::cout << "\n-- Incorrect file path! Try again! --" << std::endl;
+    } else {
+      std::cout << "\n-------------   Succes!   -----------" << std::endl;
+      isPathIncorrect = false;
+    }
+  }
+}
+
+void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, Song> &table) {
   std::ifstream dataFile;
   std::string lineFull, lineElement;
   std::string arrLines[100000];
@@ -57,22 +59,18 @@ void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, S
   dataFile.open(file_path);
 
   // split by lines
-  while (std::getline(dataFile, lineFull))
-  {
-    std::cout << lineFull << std::endl;
+  while (std::getline(dataFile, lineFull)) {
     arrLines[qty] = lineFull;
     qty++;
   }
 
   // Split the line using delimiter
-  for (int i = 0; i < qty - 1; i++)
-  {
+  for (int i = 0; i < qty - 1; i++) {
     oneLineArray = new std::string[3];
     std::istringstream istream(arrLines[i]);
     r = 0;
 
-    while (std::getline(istream, lineElement, '\t'))
-    {
+    while (std::getline(istream, lineElement, '\t')) {
       oneLineArray[r] = lineElement;
       r++;
     }
@@ -87,11 +85,55 @@ void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, S
   }
 }
 
-void addSongToHashTable(std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table)
-{
+void addSongToHashTable( std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table) {
   // Test
-  //  std::cout << "Artist: " << artist << ", Title: " << title << ", DUration: " << duration << std::endl;
+  //std::cout << "Artist: " << artist << ", Title: " << title << ", DUration: " << duration << std::endl;
 
   Song songObj = Song(title, artist, duration);
   table[artist] = songObj;
+ 
+}
+
+void printMenu(SeparateChaningHash<std::string, Song> &table) {
+  bool passCheck = false;
+  std::string option;
+
+  while (!passCheck) {
+    std::cout << std::endl
+              << std::endl;
+    std::cout << "-------------------------------------" << std::endl;
+    std::cout << "-------------    Menu     -----------" << std::endl;
+    std::cout << "-------------------------------------" << std::endl;
+    std::cout << "Add tracks from a file..............1" << std::endl;
+    std::cout << "Save to a file......................2" << std::endl;
+    std::cout << "Search by artist/band name..........3" << std::endl;
+    std::cout << "Remove specific track(s)............4" << std::endl;
+    std::cout << "Exit................................5" << std::endl;
+    std::cout << "-------------------------------------" << std::endl
+              << std::endl;
+
+    std::cout << "Select option please: ";
+    std::cin >> option;
+
+    if (option == "1")  {
+      readFile(table);
+      passCheck = true;
+    }  else if (option == "2")  {
+      std::cout << "-2" << std::endl;
+      passCheck = true;
+    }  else if (option == "3") {
+      std::cout << "-3" << std::endl;
+      passCheck = true;
+    } else if (option == "4") {
+      std::cout << "-4" << std::endl;
+      passCheck = true;
+    } else if (option == "5") {
+      std::cout << "\n-------------  Goodbye!  ------------" << std::endl
+                << std::endl;
+      passCheck = true;
+      exit(1);
+    } else {
+      std::cout << "\n--------  Incorrect option!  --------" << std::endl;
+    }
+  }
 }

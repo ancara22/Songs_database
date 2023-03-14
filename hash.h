@@ -5,14 +5,12 @@
 #include "song.h"
 
 template <typename K, typename V>
-struct Node
-{
+struct Node {
   K key;            // Artist name
   V value;          // Song object
   Node<K, V> *next; // next node/song
 
-  Node(K k, V val)
-  {
+  Node(K k, V val) {
     this->key = k;
     this->value = val;
     this->next = nullptr;
@@ -20,53 +18,51 @@ struct Node
 };
 
 template <typename K, typename V>
-class SeparateChaningHash
-{
+class SeparateChaningHash {
 private:
   Node<K, V> **array;
   size_t qty;
   size_t capacity;
+  size_t totalQty;
 
 public:
-  SeparateChaningHash()
-  {
+  SeparateChaningHash() {
     capacity = 100;
     qty = 0;
+    totalQty = 0;
     array = new Node<K, V> *[capacity];
 
-    for (size_t i = 0; i < capacity; ++i)
-    {
+    for (size_t i = 0; i < capacity; ++i) {
       array[i] = 0;
     }
   }
 
   // delete memory
-  ~SeparateChaningHash()
-  {
+  ~SeparateChaningHash() {
     delete[] array;
   }
 
   // get size
-  size_t size()
-  {
+  size_t getSize() {
     return qty;
   }
 
+  // get size
+  size_t getTotalSize() {
+    return totalQty;
+  }
+
   // check if it is empty
-  bool empty()
-  {
+  bool empty() {
     return qty == 0;
   }
 
   // find element position
-  size_t pos(K key)
-  {
+  size_t getPossition(K key) {
     size_t index = std::hash<K>{}(key) % capacity;
-    ;
 
     // if index position is not empty
-    if (array[index] != NULL)
-    {
+    if (array[index] != NULL) {
       // check if element exists in the linked list
       for (Node<K, V> *x = array[index]; x != nullptr; x = x->next)
         if (key == x->key)
@@ -76,18 +72,15 @@ public:
   }
 
   // check if table contains the key
-  bool contains(K key)
-  {
-    if (pos(key) != (size_t)-1)
-    {
+  bool contains(K key) {
+    if (getPossition(key) != (size_t)-1) {
       return true;
     }
     return false;
   }
 
   // insert a new element/song
-  void put(K key, V value)
-  {
+  void put(K key, V value) {
     qty++;
 
     // resize the table if quantity is greater than half
@@ -101,12 +94,11 @@ public:
     Node<K, V> *newNode = new Node<K, V>(key, value);
 
     // if index position is empty, add the node
-    if (array[index] == NULL)
-    {
+    if (array[index] == NULL) {
+      totalQty++;
       array[index] = newNode;
-    }
-    else
-    {
+    } else {
+      totalQty++;
       // if index position is not empty, add the node to the linked list
       // add to the second position
       Node<K, V> *next = array[index]->next;
@@ -116,45 +108,37 @@ public:
   }
 
   // get node
-  Node<K, V> *getNode(K key)
-  {
-    size_t index = pos(key);
+  Node<K, V> *getNode(K key) {
+    size_t index = getPossition(key);
 
-    if (index != (size_t)-1)
-    {
+    if (index != (size_t)-1) {
       Node<K, V> *current = array[index];
 
-      while (current != NULL)
-      {
+      while (current != NULL) {
         if (current->key == key)
           return current;
         current = current->next;
       }
     }
-
     return NULL;
   }
 
   // resize the table
-  void resize(size_t newsize)
-  {
+  void resize(size_t newsize) {
     Node<K, V> **oldArray = array;
     size_t old_capacity = capacity;
 
     array = new Node<K, V> *[newsize];
 
-    for (size_t i = 0; i < newsize; ++i)
-    {
+    for (size_t i = 0; i < newsize; ++i) {
       array[i] = 0;
     }
 
     capacity = newsize;
     qty = 0;
 
-    for (size_t i = 0; i < old_capacity; ++i)
-    {
-      if (oldArray[i] != NULL)
-      {
+    for (size_t i = 0; i < old_capacity; ++i) {
+      if (oldArray[i] != NULL) {
         put(oldArray[i]->key, oldArray[i]->value);
       }
     }
@@ -163,8 +147,7 @@ public:
   }
 
   // override the operator for inserting or getting
-  V &operator[](K key)
-  {
+  V &operator[](K key) {
     if (!contains(key))
       put(key, V());
 
@@ -173,22 +156,23 @@ public:
     return node->value;
   }
 
+
   // get all the keys
-  std::vector<K> keys()
-  {
+  /*
+  std::vector<K> getKeys() {
+
     std::vector<K> thekeys;
 
-    for (size_t i = 0; i < capacity; ++i)
-    {
+    for (size_t i = 0; i < capacity; ++i) {
       if (array[i] != NULL)
-        for (Node<K, V> *x = array[i]; x != NULL; x = x->next)
-        {
+        for (Node<K, V> *x = array[i]; x != NULL; x = x->next) {
           thekeys.push_back(x->key);
         }
     }
-
     return thekeys;
   }
+  */
+
 };
 
 #endif

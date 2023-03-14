@@ -11,10 +11,8 @@ songs_playlist: songs_playlist.o song.o
 songs_playlist.o: songs_playlist.cpp hash.h
 	$(CXX) $(CFLAGS) -c songs_playlist.cpp 
 
-
 song.o: song.cpp song.h
 	$(CXX) $(CFLAGS) -c song.cpp
-
 
 
 .PHONY : test

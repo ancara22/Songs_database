@@ -3,8 +3,7 @@
 
 #include <string>
 
-class Song
-{
+class Song {
 private:
   std::string title;
   std::string artist;
