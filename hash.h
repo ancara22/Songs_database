@@ -2,6 +2,7 @@
 #define _HASH_HPP_
 
 #include <vector>
+#include "song.h"
 
 template <typename K, typename V>
 struct Node
@@ -10,10 +11,10 @@ struct Node
   V value;          // Song object
   Node<K, V> *next; // next node/song
 
-  Node(K key, V value)
+  Node(K k, V val)
   {
-    this->key = key;
-    this->value = value;
+    this->key = k;
+    this->value = val;
     this->next = nullptr;
   }
 };
@@ -60,7 +61,8 @@ public:
   // find element position
   size_t pos(K key)
   {
-    size_t index = std::hash<K>{}(key) % capacity;;
+    size_t index = std::hash<K>{}(key) % capacity;
+    ;
 
     // if index position is not empty
     if (array[index] != NULL)

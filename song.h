@@ -3,20 +3,20 @@
 
 #include <string>
 
-class Song {
- private:
+class Song
+{
+private:
   std::string title;
   std::string artist;
   std::string duration;
 
- public:
+public:
   Song(std::string title, std::string artist, std::string duration);
+  Song();
   virtual ~Song();
   std::string getTitle();
   std::string getArtist();
   std::string getDuration();
-
 };
-
 
 #endif
