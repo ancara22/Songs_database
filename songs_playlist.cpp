@@ -4,38 +4,28 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <set>
+#include <cstdio>
 
 void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, Song> &table);
 void addSongToHashTable(std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table);
 void printMenu(SeparateChaningHash<std::string, Song> &table);
 void readFile(SeparateChaningHash<std::string, Song> &table);
-//void saveToFile(SeparateChaningHash<std::string, Song> &table);
+void search(SeparateChaningHash<std::string, Song> &table);
+void saveToFile(SeparateChaningHash<std::string, Song> &table);
+void remove(SeparateChaningHash<std::string, Song> &table);
+std::set<std::string> toSet(std::vector<std::string> vect);
+
 
 int main() {
-
   SeparateChaningHash<std::string, Song> songsTable;
 
   readFile(songsTable);
   printMenu(songsTable);
 
-  // Test
-  // Song obj = songTable["Balmorhea"];
-  // std::cout << "Artist: " << obj.getArtist() << ",   Title: " << obj.getTitle() << ",   Duration: " << obj.getDuration() << std::endl;
-
-
-  std::vector<Node<std::string, Song>*>  result = songsTable.search("Кай Метов");
-
-  std::cout << "Size: " <<result.size() << "      " << std::endl;
-
-  for(Node<std::string, Song>* node: result) {
-    std::cout << node->value.getArtist() << ",  " << node->value.getTitle() << std::endl;
-  }
-  
-
-
-
   return 0;
 }
+
 
 void readFile(SeparateChaningHash<std::string, Song> &table) {
   bool isPathIncorrect = true;
@@ -102,24 +92,17 @@ void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, S
 }
 
 void addSongToHashTable( std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table) {
-  // Test
-  //std::cout << "Artist: " << artist << ", Title: " << title << ", DUration: " << duration << std::endl;
-
-
   Song songObj = Song(title, artist, duration);
-  //table.insert(artist, songObj);
   table.put(artist, songObj);
-  //table[artist] = songObj;
- 
 }
 
 void printMenu(SeparateChaningHash<std::string, Song> &table) {
   bool passCheck = false;
-  std::string option;
-
+  
   while (!passCheck) {
-    std::cout << std::endl
-              << std::endl;
+    std::string option;
+
+    std::cout << std::endl;
     std::cout << "-------------------------------------" << std::endl;
     std::cout << "-------------    Menu     -----------" << std::endl;
     std::cout << "-------------------------------------" << std::endl;
@@ -133,32 +116,99 @@ void printMenu(SeparateChaningHash<std::string, Song> &table) {
 
     std::cout << "Select option please: ";
     std::cin >> option;
+    std::cout << " \n" << std::endl;
 
-    if (option == "1")  {
+  if (option == "1")  {
       readFile(table);
-      passCheck = true;
+
     }  else if (option == "2")  {
-      //saveToFile(table);
-      passCheck = true;
+      saveToFile(table);
+
     }  else if (option == "3") {
-      std::cout << "-3" << std::endl;
-      passCheck = true;
+      search(table);
+      std::cout << " \n" << std::endl;
+
     } else if (option == "4") {
-      std::cout << "-4" << std::endl;
-      passCheck = true;
+      remove(table);
+      
     } else if (option == "5") {
       std::cout << "\n-------------  Goodbye!  ------------" << std::endl
                 << std::endl;
       passCheck = true;
       exit(1);
     } else {
-      std::cout << "\n--------  Incorrect option!  --------" << std::endl;
+      std::cout << "\n--------  Incorrect option!  --------\n" << std::endl;
     }
+
+    
   }
 }
 
+void search(SeparateChaningHash<std::string, Song> &table) {
+  
+  char searchInput[100]={0};
+  std::cout << "Enter artist/band name: ";
+  std::cin.ignore();
+	std::cin.getline(searchInput, 40);
 
-/*
+  std::vector<Node<std::string, Song>*>  result = table.search(searchInput);
+  
+  if(result.size() > 0) {
+    std::cout << "\n-------------------------------------" << std::endl;
+    std::cout << "----------- Search Result -----------" << std::endl;
+    std::cout << "-------------------------------------" << std::endl;
+
+    for(Node<std::string, Song>* node: result) {
+      std::cout << "Artist   | " << node->value.getArtist() << std::endl;
+      std::cout << "Title    | " << node->value.getTitle() << std::endl;
+      std::cout << "Duration | " << node->value.getDuration() << std::endl;
+      std::cout << "-------------------------------------" << std::endl;
+    }
+  } else {
+    std::cout << "\n------------  No Results  -----------";
+  }
+}
+
+void remove(SeparateChaningHash<std::string, Song> &table) {
+  std::string option;
+  std::cout << "Remove one.............1\nRemove all.............2\n\n";
+  std::cout << "Enter option: ";
+  std::cin >> option;
+  
+
+  if(option == "1") {
+    char artistInput[100]={0}, titleInput[100]={0};
+  
+    std::cout << "Enter artist/band name: ";
+    std::cin.ignore();
+    std::cin.getline(artistInput, 40);
+
+    std::cout << "\nEnter song title: ";
+    std::cin.getline(titleInput, 40);
+
+    bool status = table.remove(artistInput, titleInput);
+
+    if(status) {
+      std::cout << "\n------- The Song is deleted!! -------" << std::endl;
+    } else {
+      std::cout << "\n----- This song does not exist! -----" << std::endl;
+    }
+  } else if(option == "2") {
+    char artistInput[100]={0};
+
+    std::cout << "Enter artist/band name: ";
+    std::cin.ignore();
+    std::cin.getline(artistInput, 40);
+    std::cout << "\n------ The Songs are deleted!! ------" << std::endl;
+
+    table.remove(artistInput);
+  } else {
+    std::cout << "\n--------  Incorrect option!  --------\n" << std::endl;
+  }
+
+  
+}
+
 // Save file
 void saveToFile(SeparateChaningHash<std::string, Song> &table) {
   std::ofstream file;
@@ -170,20 +220,18 @@ void saveToFile(SeparateChaningHash<std::string, Song> &table) {
   file.open(file_name);
   std::string line = "";
 
-  std::vector<std::string> artists_name = table.getKeys();
+  std::vector<Node<std::string, Song>*> allNodes = table.getAllNodes();
 
-
-  for(std::string name: artists_name) {
-    Song song = "table[name]";
+  for(Node<std::string, Song>* node: allNodes) {
+    Song song = node->value;
 
     line = "";
-    line += song.getArtist() + "\t" + song.getTitle() + "\t" + song.getDuration();
+    line += song.getTitle() + "\t" + song.getArtist() + "\t" + song.getDuration();
 
     file << line << std::endl;
   }
-
+    
   file.close();
-
 }
 
-*/
+

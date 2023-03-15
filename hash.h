@@ -4,6 +4,8 @@
 #include <vector>
 #include "song.h"
 #include <iostream>
+#include <cctype>
+#include <string>
 
 template <typename K, typename V>
 struct Node {
@@ -11,9 +13,9 @@ struct Node {
   V value;                // Song object
   Node<K, V> *next;       // next node/song
 
-  Node(K k, V val) {
+  Node(K k, V v) {
     this->key = k;
-    this->value = val;
+    this->value = v;
     this->next = nullptr;
   }
 };
@@ -72,7 +74,7 @@ public:
     }
     return false;
   }
-
+ 
   // insert a new element/song
   void put(K key, V value) {
     qty++;
@@ -113,11 +115,9 @@ public:
     for (size_t i = 0; i < newsize; ++i) {
       array[i] = 0;
     }
-
  
     capacity = newsize;
     qty = 0;
-
 
     for (size_t i = 0; i < old_capacity; ++i) {
       if (oldArray[i] != NULL) {
@@ -130,23 +130,130 @@ public:
     delete[] oldArray;
   }
 
+  //get all nodes with selected key
   std::vector<Node<K, V>*> search(K key) {
-      size_t index = getPossition(key);
+    size_t index = getPossition(key);
 
-      std::vector<Node<K, V>*> resultNodes;
+    std::vector<Node<K, V>*> resultNodes;
 
-      if (index != (size_t)-1) {
-        Node<K, V> *current = array[index];
+    if (index != (size_t)-1) {
+      Node<K, V> *current = array[index];
 
-        while (current != NULL) {
-           resultNodes.push_back(current);
-          /*if (current->key == key)
-            resultNodes.push_back(current);
-            */
-          current = current->next;
+      while (current != NULL) {
+        std::string currentKey = current->key;
+
+        toLowerCase(currentKey);
+        toLowerCase(key);
+
+        if(currentKey == key) {
+          resultNodes.push_back(current);
         }
+        current = current->next;
       }
-      return resultNodes;
+      
+    }
+
+    return resultNodes;
+  }
+
+  //string to lower case
+  void toLowerCase(std::string &str) {
+    std::transform(str.begin(), str.end(), str.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+  }
+
+  //remove node with combination key and value
+  bool remove(K key, K title) {
+    size_t index = getPossition(key);
+
+    Node<K, V> *node = array[index],
+              *previousNode = NULL;
+    
+    bool stop = false;
+
+    toLowerCase(title);
+    toLowerCase(key);
+
+    while (node != NULL &&  !stop ) {
+      std::string songTitle = node->value.getTitle();
+      std::string songKey = node->key;
+
+      toLowerCase(songTitle);
+      toLowerCase(songKey);
+      
+      if(songKey == key && songTitle == title) {
+        stop = true;
+      } else {
+        previousNode = node;      
+        node = node->next; 
+      }
+      
+    }
+
+    if(node == NULL) {
+      return false;
+    } else {
+      if(previousNode == NULL) {
+        array[index] = node->next;
+      } else {
+        previousNode->next = node->next;
+      }
+      delete node;
+      node = NULL;
+
+      return true;
+    }
+
+  }
+
+  //remove all nodes with key
+  void remove(K key) {
+    size_t index = getPossition(key);
+
+    Node<K, V> *node = array[index],
+              *previousNode = NULL;
+    
+    toLowerCase(key);
+
+    while (node != NULL) {
+      std::string songKey = node->key;
+
+      toLowerCase(songKey);
+      
+      if(songKey == key) {
+        if(previousNode == NULL) {
+          array[index] = node->next;
+          delete node;
+          node = array[index];
+        } else {
+          previousNode->next = node->next;
+          delete node;
+          node = previousNode->next;
+        }
+
+      } else {
+        previousNode = node;      
+        node = node->next; 
+      }
+    }
+
+      
+      
+    
+
+  }
+
+  //get all nodes
+  std::vector<Node<K, V>*> getAllNodes() {
+    std::vector<Node<K, V>*> nodeKeys;
+
+    for (size_t i = 0; i < capacity; ++i) {
+      if (array[i] != NULL)
+        for (Node<K, V> *x = array[i]; x != NULL; x = x->next) {
+          nodeKeys.push_back(x);
+        }
+    }
+    return nodeKeys;
   }
 
 };
