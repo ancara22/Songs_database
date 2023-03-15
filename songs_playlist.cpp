@@ -9,16 +9,30 @@ void readSongsFromFile(std::string file_path, SeparateChaningHash<std::string, S
 void addSongToHashTable(std::string artist, std::string title, std::string duration, SeparateChaningHash<std::string, Song> &table);
 void printMenu(SeparateChaningHash<std::string, Song> &table);
 void readFile(SeparateChaningHash<std::string, Song> &table);
+//void saveToFile(SeparateChaningHash<std::string, Song> &table);
 
 int main() {
 
   SeparateChaningHash<std::string, Song> songsTable;
 
+  readFile(songsTable);
   printMenu(songsTable);
 
   // Test
   // Song obj = songTable["Balmorhea"];
   // std::cout << "Artist: " << obj.getArtist() << ",   Title: " << obj.getTitle() << ",   Duration: " << obj.getDuration() << std::endl;
+
+
+  std::vector<Node<std::string, Song>*>  result = songsTable.search("Кай Метов");
+
+  std::cout << "Size: " <<result.size() << "      " << std::endl;
+
+  for(Node<std::string, Song>* node: result) {
+    std::cout << node->value.getArtist() << ",  " << node->value.getTitle() << std::endl;
+  }
+  
+
+
 
   return 0;
 }
@@ -36,9 +50,11 @@ void readFile(SeparateChaningHash<std::string, Song> &table) {
       file_path = "./sample_song_data.dat";
     }
 
-    size_t qtyBefore = table.getTotalSize();
+    size_t qtyBefore = table.getSize();
     readSongsFromFile(file_path, table);
-    size_t qtyAfter = table.getTotalSize();;
+    size_t qtyAfter = table.getSize();
+
+    std::cout << qtyAfter << std::endl;
 
     if (table.empty() || qtyBefore == qtyAfter) {
       std::cout << "\n-- Incorrect file path! Try again! --" << std::endl;
@@ -89,8 +105,11 @@ void addSongToHashTable( std::string artist, std::string title, std::string dura
   // Test
   //std::cout << "Artist: " << artist << ", Title: " << title << ", DUration: " << duration << std::endl;
 
+
   Song songObj = Song(title, artist, duration);
-  table[artist] = songObj;
+  //table.insert(artist, songObj);
+  table.put(artist, songObj);
+  //table[artist] = songObj;
  
 }
 
@@ -119,7 +138,7 @@ void printMenu(SeparateChaningHash<std::string, Song> &table) {
       readFile(table);
       passCheck = true;
     }  else if (option == "2")  {
-      std::cout << "-2" << std::endl;
+      //saveToFile(table);
       passCheck = true;
     }  else if (option == "3") {
       std::cout << "-3" << std::endl;
@@ -137,3 +156,34 @@ void printMenu(SeparateChaningHash<std::string, Song> &table) {
     }
   }
 }
+
+
+/*
+// Save file
+void saveToFile(SeparateChaningHash<std::string, Song> &table) {
+  std::ofstream file;
+
+  std::string file_name;
+  std::cout << "Enter file name: "; 
+  std::cin >> file_name;
+
+  file.open(file_name);
+  std::string line = "";
+
+  std::vector<std::string> artists_name = table.getKeys();
+
+
+  for(std::string name: artists_name) {
+    Song song = "table[name]";
+
+    line = "";
+    line += song.getArtist() + "\t" + song.getTitle() + "\t" + song.getDuration();
+
+    file << line << std::endl;
+  }
+
+  file.close();
+
+}
+
+*/

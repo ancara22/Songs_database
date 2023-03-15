@@ -27,7 +27,7 @@ private:
 
 public:
   SeparateChaningHash() {
-    capacity = 97;
+    capacity = 100;
     qty = 0;
     array = new Node<K, V> *[capacity];
 
@@ -45,6 +45,7 @@ public:
   size_t getSize() {
     return qty;
   }
+
 
   // check if it is empty
   bool empty() {
@@ -65,9 +66,29 @@ public:
     return -1;
   }
 
+ 
+  size_t getPossition2(K key, V val) {
+    size_t index = std::hash<K>{}(key) % capacity;
+
+    // if index position is not empty
+    if (array[index] != NULL) {
+      // check if element exists in the linked list
+      for (Node<K, V> *x = array[index]; x != nullptr; x = x->next)
+        if (key == x->key && val.getTitle() == x->value.getTitle()) {
+          if(x->value.getArtist() == val.getArtist()) {
+            if(x->value.getDuration() == val.getDuration()) {
+               return index;
+            }
+          }
+        }
+    }
+    return -1;
+  }
+
+
   // check if table contains the key
-  bool contains(K key) {
-    if (getPossition(key) != (size_t)-1) {
+  bool contains(K key, V val) {
+    if (getPossition2(key, val) != (size_t)-1) {
       return true;
     }
     return false;
@@ -81,7 +102,8 @@ public:
     if (qty >= capacity / 2) {
       resize(2 * capacity); // resize by 2
     }
-    
+      
+
     // hash the key
     size_t index = std::hash<K>{}(key) % capacity;
 
@@ -98,8 +120,23 @@ public:
       Node<K, V> *next = array[index]->next;
       array[index]->next = newNode;
       newNode->next = next;
-
     }
+  }
+
+  // get node
+  Node<K, V> *getNode(K key) {
+    size_t index = getPossition(key);
+
+    if (index != (size_t)-1) {
+      Node<K, V> *current = array[index];
+
+      while (current != NULL) {
+        if (current->key == key)
+          return current;
+        current = current->next;
+      }
+    }
+    return NULL;
   }
 
   // resize the table
@@ -114,23 +151,52 @@ public:
       array[i] = 0;
     }
 
- 
     capacity = newsize;
     qty = 0;
 
-
     for (size_t i = 0; i < old_capacity; ++i) {
       if (oldArray[i] != NULL) {
-        for (Node<K, V> *x = oldArray[i]; x != NULL; x = x->next) {
-          put(x->key, x->value);
-        }     
+           put(oldArray[i]->key, oldArray[i]->value);
       }
     }
 
     delete[] oldArray;
   }
 
-  std::vector<Node<K, V>*> search(K key) {
+  // override the operator for inserting or getting
+  V &operator[](K key) {
+    if (!contains(key, V())) {
+      put(key, V());
+    } else {
+      
+    }
+
+    Node<K, V> *node = getNode(key);
+
+    return node->value;
+  }
+
+  void insert(K k, V val) {
+    if (!contains(k, val)) {
+      put(k, val);
+    }
+  }
+
+  // get all the keys
+  std::vector<K> getKeys() {
+    std::vector<K> thekeys;
+
+    for (size_t i = 0; i < capacity; ++i) {
+      if (array[i] != NULL)
+        for (Node<K, V> *x = array[i]; x != NULL; x = x->next) {
+          thekeys.push_back(x->key);
+        }
+    }
+    return thekeys;
+  }
+
+
+  std::vector<Node<K, V>*> getNodes(K key) {
       size_t index = getPossition(key);
 
       std::vector<Node<K, V>*> resultNodes;
@@ -139,17 +205,19 @@ public:
         Node<K, V> *current = array[index];
 
         while (current != NULL) {
-           resultNodes.push_back(current);
-          /*if (current->key == key)
+          if (current->key == key)
             resultNodes.push_back(current);
-            */
+            
           current = current->next;
         }
       }
       return resultNodes;
-  }
+    }
 
+  
 };
+
+
 
 
 #endif

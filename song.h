@@ -16,6 +16,9 @@ public:
   std::string getTitle();
   std::string getArtist();
   std::string getDuration();
+  bool operator==(Song &song);
+
 };
+
 
 #endif

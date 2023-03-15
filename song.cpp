@@ -22,3 +22,15 @@ std::string Song::getArtist() {
 std::string Song::getDuration() {
   return this->duration;
 }
+
+bool Song::operator==(Song &song) {
+  if(this->getArtist() == song.getArtist()) {
+    if(this->getTitle() == song.getTitle()) {
+      if(this->getDuration() == song.getDuration()) {
+        return true;
+      }
+    }
+  }
+
+  return false; 
+}
