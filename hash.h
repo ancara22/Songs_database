@@ -2,7 +2,7 @@
 #define _HASH_HPP_
 
 #include <vector>
-#include "song.h"
+#include "track.h"
 #include <iostream>
 #include <cctype>
 #include <string>
@@ -10,7 +10,7 @@
 template <typename K, typename V>
 struct Node {
   K key;                  // Artist name
-  V value;                // Song object
+  V value;                // Track object
   Node<K, V> *next;       // next node/song
 
   Node(K k, V v) {
@@ -51,6 +51,11 @@ public:
   // check if it is empty
   bool empty() {
     return qty == 0;
+  }
+
+  //get capacity
+  size_t getCapacity() {
+    return capacity;
   }
 
   // find element position
@@ -106,7 +111,6 @@ public:
 
   // resize the table
   void resize(size_t newsize) {
-
     Node<K, V> **oldArray = array;
     size_t old_capacity = capacity;
 

@@ -3,26 +3,31 @@ CFLAGS = -g -std=c++11  -Wall -Wextra -Wpedantic
 
 
 .PHONY : all
-all: songs_playlist
+all: tracks_library
 
-songs_playlist: songs_playlist.o song.o 
+tracks_library: tracks_library.o track.o functions.o
 	$(CXX) $(CFLAGS) -o $@ $^ 
 
-songs_playlist.o: songs_playlist.cpp hash.h
-	$(CXX) $(CFLAGS) -c songs_playlist.cpp 
+tracks_library.o: tracks_library.cpp hash.h functions.o
+	$(CXX) $(CFLAGS) -c tracks_library.cpp 
 
-song.o: song.cpp song.h
-	$(CXX) $(CFLAGS) -c song.cpp
+functions.o: functions.cpp functions.h
+	$(CXX) $(CFLAGS) -c functions.cpp
+
+
+track.o: track.cpp track.h
+	$(CXX) $(CFLAGS) -c track.cpp
 
 
 .PHONY : test
-test: songs_test.cpp song.o
+test: app_test.cpp track.o functions.o
 	$(CXX) $(CFLAGS) -o $@ $^
+	
 
 
 .PHONY : clean
 clean:
-	rm -f  songs_playlist
+	rm -f  tracks_library
 	rm -f  *.o
 	rm -f *.out
 	rm -f test
